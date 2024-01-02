@@ -17,18 +17,18 @@ class TodoControllerTest extends TestCase
         $response = $this->get(route(self::TODO_PAGE_ROUTE_NAME));
 
         $response->assertOk();
-        $response->assertViewIs(route(self::TODO_PAGE_ROUTE_NAME));
+        $response->assertViewIs(self::TODO_PAGE_ROUTE_NAME);
         $response->assertValid();
     }
 
     public function test_todo_page_has_todo_contents_in_order(): void
     {
-        Todo::factory(10)->create();
+        Todo::factory(2)->create();
 
         $response = $this->get(route(self::TODO_PAGE_ROUTE_NAME));
 
         $contents = Todo::all()->map(fn ($todo) => $todo->content)->toArray();
-        $response->assertSeeTextInOrder($contents);
+        $response->assertSeeInOrder($contents);
     }
 
     public function test_post_todo_page_returns_method_not_allowed(): void

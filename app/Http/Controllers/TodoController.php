@@ -4,15 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Todo;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class TodoController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): View
     {
-        //
+        $todos = Todo::all();
+        return view('todos.index', compact(['todos']));
     }
 
     /**
