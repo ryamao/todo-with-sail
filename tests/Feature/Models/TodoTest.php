@@ -13,12 +13,15 @@ class TodoTest extends TestCase
 
     public function test_creation_with_normal_data(): void
     {
-        Todo::create([
+        $todo1 = Todo::create([
             'content' => 'A',
         ]);
-        Todo::create([
+        $todo2 = Todo::create([
             'content' => $this->faker()->text(20),
         ]);
+
+        $this->assertModelExists($todo1);
+        $this->assertModelExists($todo2);
     }
 
     public function test_creation_with_abnormal_data(): void
