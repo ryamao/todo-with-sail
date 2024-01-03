@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\TodoController;
+use App\Livewire\TodoApp;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,7 +14,4 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', [TodoController::class, 'index']);
-
-Route::resource('todos', TodoController::class)
-    ->only(['index']);
+Route::get('/', TodoApp::class);
