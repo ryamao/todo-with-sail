@@ -20,18 +20,19 @@
     @endif
 
     <div class="w-4/5 max-w-screen-lg mx-auto mt-16 space-y-12">
-        <livewire:create-todo />
+        <livewire:create-todo :$categories />
 
         <table class="w-full">
-            <thead class="border-b">
-                <tr>
-                    <th class="text-left text-2xl p-4">Todo</th>
+            <thead>
+                <tr class="border-b">
+                    <th class="text-left text-xl p-4">Todo</th>
+                    <th class="text-left text-xl p-2">カテゴリ</th>
                     <th></th>
                 </tr>
             </thead>
-            <tbody class="*:grid *:grid-cols-[minmax(0,1fr)_auto] *:border-b">
-                @foreach ($todos as $todo)
-                <livewire:todo-row :$todo :key="$todo->id" />
+            <tbody class="*:border-b">
+                @foreach ($todos->sortBy('created_at') as $todo)
+                <livewire:todo-row :$todo :$categories :key="$todo->id" />
                 @endforeach
             </tbody>
         </table>
