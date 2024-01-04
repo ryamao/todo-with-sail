@@ -1,7 +1,7 @@
 <div>
     @unless (empty($infoMessages))
     <div class="bg-teal-200 text-teal-800 border-b border-b-teal-100">
-        <ul class="max-w-screen-xl mx-auto pl-8 *:py-1">
+        <ul class="max-w-screen-xl mx-auto pl-8 *:py-1.5">
             @foreach ($infoMessages as $message)
             <li>{{ $message }}</li>
             @endforeach
@@ -11,7 +11,7 @@
 
     @if ($errors->any())
     <div class="bg-rose-200 text-rose-800 border-b border-b-rose-100">
-        <ul class="list-disc list-inside max-w-screen-xl mx-auto pl-6 *:py-1">
+        <ul class="list-disc list-inside max-w-screen-xl mx-auto pl-6 *:py-1.5">
             @foreach ($errors->all() as $message)
             <li>{{ $message }}</li>
             @endforeach
