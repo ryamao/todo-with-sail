@@ -3,20 +3,23 @@
 namespace App\Livewire;
 
 use App\Models\Todo;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\View\View;
-use Livewire\Attributes\On;
 use Livewire\Component;
 
 class TodoRow extends Component
 {
     public Todo $todo;
+    public Collection $categories;
 
-    public string $content;
+    public ?string $content = null;
+    public ?int $categoryId = null;
 
-    public function mount(Todo $todo): void
+    public function mount(Todo $todo, Collection $categories): void
     {
         $this->todo = $todo;
-        $this->content = $todo->content;
+        $this->categories = $categories;
+        $this->setFormValue($this->todo);
     }
 
     public function render(): View
@@ -26,12 +29,30 @@ class TodoRow extends Component
 
     public function update(): void
     {
-        if ($this->content === $this->todo->content) return;
-        $this->dispatch('todo-updating', todo: $this->todo, content: $this->content);
+        if ($this->isNotFormChanged()) return;
+
+        $this->dispatch(
+            'todo-updating',
+            todo: $this->todo,
+            content: $this->content,
+            categoryId: $this->categoryId,
+        );
     }
 
     public function delete(): void
     {
         $this->dispatch('todo-deleting', todo: $this->todo);
+    }
+
+    private function setFormValue(Todo $todo): void
+    {
+        $this->content = $todo->content;
+        $this->categoryId = $todo->category_id;
+    }
+
+    private function isNotFormChanged(): bool
+    {
+        return $this->content === $this->todo->content
+            && $this->categoryId === $this->todo->category_id;
     }
 }

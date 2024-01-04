@@ -2,13 +2,12 @@
 
 namespace Database\Factories;
 
-use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Todo>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Category>
  */
-class TodoFactory extends Factory
+class CategoryFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -17,10 +16,9 @@ class TodoFactory extends Factory
      */
     public function definition(): array
     {
-        $createdAt = fake()->dateTimeBetween(startDate: '-1 day');
+        $createdAt = fake()->dateTimeBetween(startDate: '-2 day', endDate: '-1 day');
         return [
-            'content' => fake()->text(20),
-            'category_id' => Category::factory(),
+            'name' => fake()->text(10),
             'created_at' => $createdAt,
             'updated_at' => $createdAt,
         ];

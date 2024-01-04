@@ -3,35 +3,36 @@
 namespace Tests\Feature\Livewire;
 
 use App\Livewire\CreateTodo;
-use App\Livewire\TodoApp;
+use App\Livewire\TodoPage;
 use App\Livewire\TodoRow;
+use App\Models\Category;
 use App\Models\Todo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
 
-class TodoAppTest extends TestCase
+class TodoPageTest extends TestCase
 {
     use RefreshDatabase;
 
     /** @test */
     public function renders_successfully()
     {
-        Livewire::test(TodoApp::class)
+        Livewire::test(TodoPage::class)
             ->assertStatus(200);
     }
 
     /** @test */
     public function has_no_errors_by_default()
     {
-        Livewire::test(TodoApp::class)
+        Livewire::test(TodoPage::class)
             ->assertHasNoErrors();
     }
 
     /** @test */
     public function can_see_create_post_component()
     {
-        Livewire::test(TodoApp::class)
+        Livewire::test(TodoPage::class)
             ->assertSeeLivewire(CreateTodo::class);
     }
 
@@ -39,7 +40,7 @@ class TodoAppTest extends TestCase
     public function cannot_see_todo_row_component_when_todo_doesnt_exist()
     {
         $this->assertDatabaseEmpty('todos');
-        Livewire::test(TodoApp::class)
+        Livewire::test(TodoPage::class)
             ->assertDontSeeLivewire(TodoRow::class);
     }
 
@@ -47,7 +48,7 @@ class TodoAppTest extends TestCase
     public function can_see_todo_row_component_when_todo_exists()
     {
         Todo::factory()->create();
-        Livewire::test(TodoApp::class)
+        Livewire::test(TodoPage::class)
             ->assertSeeLivewire(TodoRow::class);
     }
     /** @test */
@@ -101,10 +102,11 @@ class TodoAppTest extends TestCase
     /** @test */
     public function can_delete_todo()
     {
-        $todo = Todo::create(['content' => 'test']);
+        $category = Category::factory()->create();
+        $todo = Todo::create(['content' => 'test', 'category_id' => $category->id]);
         $this->assertDatabaseCount('todos', 1);
 
-        Livewire::test(TodoApp::class)
+        Livewire::test(TodoPage::class)
             ->dispatch('todo-deleting', todo: $todo)
             ->assertDispatched('todo-deleted')
             ->assertHasNoErrors()
@@ -117,9 +119,10 @@ class TodoAppTest extends TestCase
     private function assertCanCreateTodo(string $content)
     {
         $this->assertDatabaseEmpty('todos');
+        $category = Category::factory()->create();
 
-        Livewire::test(TodoApp::class)
-            ->dispatch('todo-creating', content: $content)
+        Livewire::test(TodoPage::class)
+            ->dispatch('todo-creating', content: $content, categoryId: $category->id)
             ->assertDispatched('todo-created')
             ->assertHasNoErrors()
             ->assertSeeText('Todoを作成しました')
@@ -128,14 +131,16 @@ class TodoAppTest extends TestCase
         $this->assertDatabaseCount('todos', 1);
         $todo = Todo::first();
         $this->assertSame($content, $todo->content);
+        $this->assertSame($category->id, $todo->category_id);
     }
 
     private function assertCannotCreateTodo(string $content)
     {
         $this->assertDatabaseEmpty('todos');
+        $category = Category::factory()->create();
 
-        Livewire::test(TodoApp::class)
-            ->dispatch('todo-creating', content: $content)
+        Livewire::test(TodoPage::class)
+            ->dispatch('todo-creating', content: $content, categoryId: $category->id)
             ->assertNotDispatched('todo-created')
             ->assertHasErrors()
             ->assertDontSeeLivewire(TodoRow::class);
@@ -146,10 +151,11 @@ class TodoAppTest extends TestCase
     private function assertCanUpdateTodo(string $content)
     {
         $this->assertDatabaseEmpty('todos');
-        $todo = Todo::create(['content' => 'test']);
+        $category = Category::factory()->create();
+        $todo = Todo::create(['content' => 'test', 'category_id' => $category->id]);
 
-        Livewire::test(TodoApp::class)
-            ->dispatch('todo-updating', todo: $todo, content: $content)
+        Livewire::test(TodoPage::class)
+            ->dispatch('todo-updating', todo: $todo, content: $content, categoryId: $category->id)
             ->assertDispatched('todo-updated')
             ->assertHasNoErrors()
             ->assertSeeText('Todoを更新しました');
@@ -162,11 +168,12 @@ class TodoAppTest extends TestCase
     private function assertCannotUpdateTodo(string $content)
     {
         $this->assertDatabaseEmpty('todos');
+        $category = Category::factory()->create();
         $oldContent = 'test';
-        $todo = Todo::create(['content' => $oldContent]);
+        $todo = Todo::create(['content' => $oldContent, 'category_id' => $category->id]);
 
-        Livewire::test(TodoApp::class)
-            ->dispatch('todo-creating', content: $content)
+        Livewire::test(TodoPage::class)
+            ->dispatch('todo-creating', content: $content, categoryId: $category->id)
             ->assertNotDispatched('todo-created')
             ->assertHasErrors()
             ->assertDontSeeLivewire(TodoRow::class);
