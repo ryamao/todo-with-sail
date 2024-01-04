@@ -11,8 +11,13 @@
 
 <body>
     <header class="bg-black text-white">
-        <div class="max-w-screen-xl mx-auto">
-            <h1 class="text-3xl font-bold pl-4 py-5">Todo</h1>
+        <div class="max-w-screen-xl mx-auto flex justify-between items-center px-4 py-5">
+            <h1 class="text-3xl">
+                <a href="/" wire:navigate>Todo</a>
+            </h1>
+            <div>
+                <a href="/categories" wire:navigate>カテゴリ一覧</a>
+            </div>
         </div>
     </header>
 

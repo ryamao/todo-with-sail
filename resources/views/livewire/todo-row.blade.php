@@ -20,7 +20,7 @@
                 </button>
             </form>
             <form wire:submit="delete">
-                <button type="submit" class="bg-red-600 text-white rounded w-16 h-8"">
+                <button type="submit" class="bg-red-600 text-white rounded w-16 h-8">
                     削除
                 </button>
             </form>

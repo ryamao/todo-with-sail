@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\CategoryPage;
 use App\Livewire\TodoPage;
 use Illuminate\Support\Facades\Route;
 
@@ -15,3 +16,4 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', TodoPage::class);
+Route::get('/categories', CategoryPage::class);
