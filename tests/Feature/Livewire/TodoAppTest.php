@@ -3,8 +3,8 @@
 namespace Tests\Feature\Livewire;
 
 use App\Livewire\CreateTodo;
-use App\Livewire\ShowTodos;
 use App\Livewire\TodoApp;
+use App\Livewire\TodoRow;
 use App\Models\Todo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -22,35 +22,34 @@ class TodoAppTest extends TestCase
     }
 
     /** @test */
-    public function has_no_errors()
+    public function has_no_errors_by_default()
     {
         Livewire::test(TodoApp::class)
             ->assertHasNoErrors();
     }
 
     /** @test */
-    public function todos_property_is_empty_when_todos_table_is_empty()
+    public function can_see_create_post_component()
     {
-        $this->assertDatabaseEmpty('todos');
-
-        $me = Livewire::test(TodoApp::class);
-        $this->assertEmpty($me->viewData('todos'));
+        Livewire::test(TodoApp::class)
+            ->assertSeeLivewire(CreateTodo::class);
     }
 
     /** @test */
-    public function todos_are_same_as_todo_all()
+    public function cannot_see_todo_row_component_when_todo_doesnt_exist()
     {
         $this->assertDatabaseEmpty('todos');
-        $dbTodos = Todo::factory(5)->create();
-
-        $me = Livewire::test(TodoApp::class);
-        $viewTodos = $me->viewData('todos');
-        $this->assertCount($dbTodos->count(), $viewTodos);
-        foreach ($dbTodos->zip($viewTodos) as [$e, $a]) {
-            $this->assertSame($e->content, $a->content);
-        }
+        Livewire::test(TodoApp::class)
+            ->assertDontSeeLivewire(TodoRow::class);
     }
 
+    /** @test */
+    public function can_see_todo_row_component_when_todo_exists()
+    {
+        Todo::factory()->create();
+        Livewire::test(TodoApp::class)
+            ->assertSeeLivewire(TodoRow::class);
+    }
     /** @test */
     public function can_create_todo_with_content_of_length_1()
     {
@@ -64,47 +63,100 @@ class TodoAppTest extends TestCase
     }
 
     /** @test */
-    public function fails_validation_with_content_of_length_0()
+    public function cannot_create_todo_with_content_of_length_0()
     {
-        $this->assertFailsValidation('', 'required');
+        $this->assertCannotCreateTodo('');
     }
 
     /** @test */
-    public function fails_validation_with_content_of_length_21()
+    public function cannot_create_todo_with_content_of_length_21()
     {
-        $this->assertFailsValidation(str_repeat('A', 21), 'max');
+        $this->assertCannotCreateTodo(str_repeat('A', 21));
+    }
+
+    /** @test */
+    public function can_update_todo_with_content_of_length_1()
+    {
+        $this->assertCanUpdateTodo('A');
+    }
+
+    /** @test */
+    public function can_update_todo_with_content_of_length_20()
+    {
+        $this->assertCanUpdateTodo(str_repeat('A', 20));
+    }
+
+    /** @test */
+    public function cannot_update_todo_with_content_of_length_0()
+    {
+        $this->assertCannotUpdateTodo('');
+    }
+
+    /** @test */
+    public function cannot_update_todo_with_content_of_length_21()
+    {
+        $this->assertCannotUpdateTodo(str_repeat('A', 21));
     }
 
     private function assertCanCreateTodo(string $content)
     {
         $this->assertDatabaseEmpty('todos');
 
-        $me = Livewire::test(TodoApp::class);
-        $me->set('content', $content);
-        $me->call('create');
-        $me->assertHasNoErrors();
-        $me->assertSet('content', '');
+        Livewire::test(TodoApp::class)
+            ->dispatch('todo-creating', content: $content)
+            ->assertDispatched('todo-created')
+            ->assertHasNoErrors()
+            ->assertSeeText('Todoを作成しました')
+            ->assertSeeLivewire(TodoRow::class);
 
-        $dbTodos = Todo::all();
-        $this->assertCount(1, $dbTodos);
-        $this->assertSame($content, $dbTodos[0]->content);
-
-        $viewTodos = $me->viewData('todos');
-        $this->assertCount(1, $viewTodos);
-        $this->assertSame($content, $viewTodos[0]->content);
+        $this->assertDatabaseCount('todos', 1);
+        $todo = Todo::first();
+        $this->assertSame($content, $todo->content);
     }
 
-    private function assertFailsValidation(string $content, string $rule)
+    private function assertCannotCreateTodo(string $content)
     {
         $this->assertDatabaseEmpty('todos');
 
-        $me = Livewire::test(TodoApp::class);
-        $me->set('content', $content);
-        $me->call('create');
-        $me->assertHasErrors(['content' => $rule]);
-        $me->assertSet('content', $content);
+        Livewire::test(TodoApp::class)
+            ->dispatch('todo-creating', content: $content)
+            ->assertNotDispatched('todo-created')
+            ->assertHasErrors()
+            ->assertDontSeeLivewire(TodoRow::class);
 
         $this->assertDatabaseEmpty('todos');
-        $this->assertEmpty($me->viewData('todos'));
+    }
+
+    private function assertCanUpdateTodo(string $content)
+    {
+        $this->assertDatabaseEmpty('todos');
+        $todo = Todo::create(['content' => 'test']);
+
+        Livewire::test(TodoApp::class)
+            ->dispatch('todo-updating', todo: $todo, content: $content)
+            ->assertDispatched('todo-updated')
+            ->assertHasNoErrors()
+            ->assertSeeText('Todoを更新しました');
+
+        $this->assertDatabaseCount('todos', 1);
+        $todo = Todo::first();
+        $this->assertSame($content, $todo->content);
+    }
+
+    private function assertCannotUpdateTodo(string $content)
+    {
+        $this->assertDatabaseEmpty('todos');
+        $oldContent = 'test';
+        $todo = Todo::create(['content' => $oldContent]);
+
+        Livewire::test(TodoApp::class)
+            ->dispatch('todo-creating', content: $content)
+            ->assertNotDispatched('todo-created')
+            ->assertHasErrors()
+            ->assertDontSeeLivewire(TodoRow::class);
+
+        $this->assertDatabaseCount('todos', 1);
+        $todo = Todo::first();
+        $this->assertSame($oldContent, $todo->content);
     }
 }
