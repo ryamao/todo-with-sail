@@ -4,8 +4,10 @@ namespace App\Livewire;
 
 use App\Models\Category;
 use App\Models\Todo;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -13,13 +15,21 @@ use Livewire\Component;
 #[Title('Todo')]
 class TodoPage extends Component
 {
+    public string $searchKeyword = '';
+    public ?int $searchCategoryId = null;
+
     public array $infoMessages = [];
+
+    public function boot(): void
+    {
+        $this->reset('infoMessages');
+        $this->resetValidation();
+    }
 
     public function render(): View
     {
-        $todos = Todo::all();
         $categories = Category::all();
-        return view('livewire.todo-page', compact('todos', 'categories'));
+        return view('livewire.todo-page', compact('categories'));
     }
 
     public function rules(): array
@@ -40,12 +50,19 @@ class TodoPage extends Component
         ];
     }
 
-    #[On('todo-creating')]
-    public function onTodoCreating(string $content, ?int $category_id): void
+    #[Computed]
+    public function todos(): Collection
     {
-        $this->resetMessages();
+        return Todo::categorySearch($this->searchCategoryId)
+            ->keywordSearch($this->searchKeyword)
+            ->get();
+    }
 
-        $validated = Validator::validate(compact('content', 'category_id'), $this->rules(), $this->messages());
+    #[On('todo-creating')]
+    public function onTodoCreating(string $content, ?int $categoryId): void
+    {
+        $data = ['content' => $content, 'category_id' => $categoryId];
+        $validated = Validator::validate($data, $this->rules(), $this->messages());
         Todo::create($validated);
 
         $this->infoMessages[] = 'Todoを作成しました';
@@ -53,11 +70,10 @@ class TodoPage extends Component
     }
 
     #[On('todo-updating')]
-    public function onTodoUpdating(Todo $todo, string $content, ?int $category_id): void
+    public function onTodoUpdating(Todo $todo, string $content, ?int $categoryId): void
     {
-        $this->resetMessages();
-
-        $validated = Validator::validate(compact('content', 'category_id'), $this->rules(), $this->messages());
+        $data = ['content' => $content, 'category_id' => $categoryId];
+        $validated = Validator::validate($data, $this->rules(), $this->messages());
         $todo->update($validated);
 
         $this->infoMessages[] = 'Todoを更新しました';
@@ -67,17 +83,17 @@ class TodoPage extends Component
     #[On('todo-deleting')]
     public function onTodoDeleting(Todo $todo): void
     {
-        $this->resetMessages();
-
         $todo->delete();
 
         $this->infoMessages[] = 'Todoを削除しました';
         $this->dispatch('todo-deleted');
     }
 
-    private function resetMessages(): void
+    #[On('todo-searching')]
+    public function onTodoSearching(string $keyword, ?int $categoryId): void
     {
-        $this->reset('infoMessages');
-        $this->resetValidation();
+        $this->searchKeyword = $keyword;
+        $this->searchCategoryId = $categoryId;
+        $this->dispatch('todo-searched');
     }
 }

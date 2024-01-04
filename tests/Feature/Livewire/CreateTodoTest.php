@@ -37,9 +37,9 @@ class CreateTodoTest extends TestCase
 
         Livewire::test(CreateTodo::class, compact('categories'))
             ->set('content', 'test')
-            ->set('category_id', $categories[0]->id)
+            ->set('categoryId', $categories[0]->id)
             ->call('create')
-            ->assertDispatched('todo-creating', content: 'test', category_id: $categories[0]->id);
+            ->assertDispatched('todo-creating', content: 'test', categoryId: $categories[0]->id);
     }
 
     /** @test */
@@ -49,7 +49,7 @@ class CreateTodoTest extends TestCase
 
         Livewire::test(CreateTodo::class, compact('categories'))
             ->set('content', 'test')
-            ->set('category_id', $categories[0]->id)
+            ->set('categoryId', $categories[0]->id)
             ->dispatch('todo-created')
             ->assertSet('content', '');
     }

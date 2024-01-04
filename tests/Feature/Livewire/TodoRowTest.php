@@ -18,6 +18,7 @@ class TodoRowTest extends TestCase
     {
         $categories = Category::factory(3)->create();
         $todo = Todo::factory()->recycle($categories)->create();
+
         Livewire::test(TodoRow::class, compact('todo', 'categories'))
             ->assertStatus(200);
     }
@@ -30,7 +31,7 @@ class TodoRowTest extends TestCase
 
         Livewire::test(TodoRow::class, compact('todo', 'categories'))
             ->assertSet('content', $todo->content)
-            ->assertSet('category_id', $todo->category_id);
+            ->assertSet('categoryId', $todo->category_id);
     }
 
     /** @test */
@@ -61,7 +62,7 @@ class TodoRowTest extends TestCase
                 function ($eventName, $params) use ($todo, $categories, $newContent) {
                     return $params['todo']['id'] === $todo->id
                         && $params['content'] === $newContent
-                        && $params['category_id'] === $categories[0]->id;
+                        && $params['categoryId'] === $categories[0]->id;
                 }
             );
     }
@@ -75,14 +76,14 @@ class TodoRowTest extends TestCase
             ->create();
 
         Livewire::test(TodoRow::class, compact('todo', 'categories'))
-            ->set('category_id', $categories[1]->id)
+            ->set('categoryId', $categories[1]->id)
             ->call('update')
             ->assertDispatched(
                 'todo-updating',
                 function ($eventName, $params) use ($todo, $categories) {
                     return $params['todo']['id'] === $todo->id
                         && $params['content'] === $todo->content
-                        && $params['category_id'] === $categories[1]->id;
+                        && $params['categoryId'] === $categories[1]->id;
                 }
             );
     }

@@ -5,7 +5,6 @@ namespace App\Livewire;
 use App\Models\Todo;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\View\View;
-use Livewire\Attributes\On;
 use Livewire\Component;
 
 class TodoRow extends Component
@@ -14,7 +13,7 @@ class TodoRow extends Component
     public Collection $categories;
 
     public ?string $content = null;
-    public ?int $category_id = null;
+    public ?int $categoryId = null;
 
     public function mount(Todo $todo, Collection $categories): void
     {
@@ -36,7 +35,7 @@ class TodoRow extends Component
             'todo-updating',
             todo: $this->todo,
             content: $this->content,
-            category_id: $this->category_id,
+            categoryId: $this->categoryId,
         );
     }
 
@@ -48,12 +47,12 @@ class TodoRow extends Component
     private function setFormValue(Todo $todo): void
     {
         $this->content = $todo->content;
-        $this->category_id = $todo->category_id;
+        $this->categoryId = $todo->category_id;
     }
 
     private function isNotFormChanged(): bool
     {
         return $this->content === $this->todo->content
-            && $this->category_id === $this->todo->category_id;
+            && $this->categoryId === $this->todo->category_id;
     }
 }

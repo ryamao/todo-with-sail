@@ -20,7 +20,12 @@
     @endif
 
     <div class="w-4/5 max-w-screen-lg mx-auto mt-16 space-y-12">
-        <livewire:create-todo :$categories />
+        <div class="space-y-4">
+            <h2 class="text-2xl font-bold">新規作成</h2>
+            <livewire:create-todo :$categories />
+            <h2 class="text-2xl font-bold">Todo検索</h2>
+            <livewire:search-todo :keyword="$searchKeyword" :categoryId="$searchCategoryId" :$categories />
+        </div>
 
         <table class="w-full">
             <thead>
@@ -31,7 +36,7 @@
                 </tr>
             </thead>
             <tbody class="*:border-b">
-                @foreach ($todos->sortBy('created_at') as $todo)
+                @foreach ($this->todos->sortBy('created_at') as $todo)
                 <livewire:todo-row :$todo :$categories :key="$todo->id" />
                 @endforeach
             </tbody>

@@ -4,7 +4,7 @@
     </td>
 
     <td>
-        <select wire:model="category_id" class="appearance-none p-3 w-4/5">
+        <select wire:model="categoryId" class="appearance-none p-3 w-4/5">
             <option disabled>カテゴリ</option>
             @foreach ($categories->sortBy('created_at') as $category)
             <option value="{{ $category->id }}" wire:key="$category->id">{{ $category->name }}</option>

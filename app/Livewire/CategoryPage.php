@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Category;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\View\View;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -13,7 +14,13 @@ class CategoryPage extends Component
 {
     public array $infoMessages = [];
 
-    public function render()
+    public function boot(): void
+    {
+        $this->reset('infoMessages');
+        $this->resetValidation();
+    }
+
+    public function render(): View
     {
         $categories = Category::all();
         return view('livewire.category-page', compact('categories'));
@@ -38,8 +45,6 @@ class CategoryPage extends Component
     #[On('category-creating')]
     public function onCategoryCreated(string $name): void
     {
-        $this->resetMessages();
-
         $validated = Validator::validate(compact('name'), $this->rules(), $this->messages());
         Category::create($validated);
 
@@ -50,8 +55,6 @@ class CategoryPage extends Component
     #[On('category-updating')]
     public function onCategoryUpdating(Category $category, string $name): void
     {
-        $this->resetMessages();
-
         $validated = Validator::validate(compact('name'), $this->rules(), $this->messages());
         $category->update($validated);
 
@@ -62,17 +65,9 @@ class CategoryPage extends Component
     #[On('category-deleting')]
     public function onCategoryDeleting(Category $category): void
     {
-        $this->resetMessages();
-
         $category->delete();
 
         $this->infoMessages[] = 'カテゴリを削除しました';
         $this->dispatch('category->deleted');
-    }
-
-    private function resetMessages(): void
-    {
-        $this->reset('infoMessages');
-        $this->resetValidation();
     }
 }

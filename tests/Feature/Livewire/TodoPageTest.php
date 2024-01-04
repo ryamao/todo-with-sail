@@ -122,7 +122,7 @@ class TodoPageTest extends TestCase
         $category = Category::factory()->create();
 
         Livewire::test(TodoPage::class)
-            ->dispatch('todo-creating', content: $content, category_id: $category->id)
+            ->dispatch('todo-creating', content: $content, categoryId: $category->id)
             ->assertDispatched('todo-created')
             ->assertHasNoErrors()
             ->assertSeeText('Todoを作成しました')
@@ -140,7 +140,7 @@ class TodoPageTest extends TestCase
         $category = Category::factory()->create();
 
         Livewire::test(TodoPage::class)
-            ->dispatch('todo-creating', content: $content, category_id: $category->id)
+            ->dispatch('todo-creating', content: $content, categoryId: $category->id)
             ->assertNotDispatched('todo-created')
             ->assertHasErrors()
             ->assertDontSeeLivewire(TodoRow::class);
@@ -155,7 +155,7 @@ class TodoPageTest extends TestCase
         $todo = Todo::create(['content' => 'test', 'category_id' => $category->id]);
 
         Livewire::test(TodoPage::class)
-            ->dispatch('todo-updating', todo: $todo, content: $content, category_id: $category->id)
+            ->dispatch('todo-updating', todo: $todo, content: $content, categoryId: $category->id)
             ->assertDispatched('todo-updated')
             ->assertHasNoErrors()
             ->assertSeeText('Todoを更新しました');
@@ -173,7 +173,7 @@ class TodoPageTest extends TestCase
         $todo = Todo::create(['content' => $oldContent, 'category_id' => $category->id]);
 
         Livewire::test(TodoPage::class)
-            ->dispatch('todo-creating', content: $content, category_id: $category->id)
+            ->dispatch('todo-creating', content: $content, categoryId: $category->id)
             ->assertNotDispatched('todo-created')
             ->assertHasErrors()
             ->assertDontSeeLivewire(TodoRow::class);
