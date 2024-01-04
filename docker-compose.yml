@@ -33,6 +33,7 @@ services:
             POSTGRES_DB: '${DB_DATABASE}'
             POSTGRES_USER: '${DB_USERNAME}'
             POSTGRES_PASSWORD: '${DB_PASSWORD:-secret}'
+            TZ: 'Asia/Tokyo'
         volumes:
             - 'sail-pgsql:/var/lib/postgresql/data'
             - './docker/pgsql/create-testing-database.sql:/docker-entrypoint-initdb.d/10-create-testing-database.sql'
@@ -59,6 +60,7 @@ services:
         environment:
             PGADMIN_DEFAULT_EMAIL: '${PGADMIN_EMAIL}'
             PGADMIN_DEFAULT_PASSWORD: '${PGADMIN_PASSWORD}'
+            TZ: 'Asia/Tokyo'
         networks:
             - sail
 
