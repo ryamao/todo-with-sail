@@ -98,6 +98,22 @@ class TodoAppTest extends TestCase
         $this->assertCannotUpdateTodo(str_repeat('A', 21));
     }
 
+    /** @test */
+    public function can_delete_todo()
+    {
+        $todo = Todo::create(['content' => 'test']);
+        $this->assertDatabaseCount('todos', 1);
+
+        Livewire::test(TodoApp::class)
+            ->dispatch('todo-deleting', todo: $todo)
+            ->assertDispatched('todo-deleted')
+            ->assertHasNoErrors()
+            ->assertSeeText('Todoを削除しました')
+            ->assertDontSeeLivewire(TodoRow::class);
+
+        $this->assertDatabaseEmpty('todos');
+    }
+
     private function assertCanCreateTodo(string $content)
     {
         $this->assertDatabaseEmpty('todos');

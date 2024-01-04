@@ -51,4 +51,17 @@ class TodoRowTest extends TestCase
                 }
             );
     }
+
+    /** @test */
+    public function dispatches_todo_deleting_event()
+    {
+        $todo = Todo::factory()->create();
+
+        Livewire::test(TodoRow::class, compact('todo'))
+            ->call('delete')
+            ->assertDispatched(
+                'todo-deleting',
+                fn ($eventName, $params) => $params['todo']['id'] === $todo->id
+            );
+    }
 }

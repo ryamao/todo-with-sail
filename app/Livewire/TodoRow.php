@@ -29,4 +29,9 @@ class TodoRow extends Component
         if ($this->content === $this->todo->content) return;
         $this->dispatch('todo-updating', todo: $this->todo, content: $this->content);
     }
+
+    public function delete(): void
+    {
+        $this->dispatch('todo-deleting', todo: $this->todo);
+    }
 }

@@ -45,6 +45,17 @@ class TodoApp extends Component
         $this->dispatch('todo-updated');
     }
 
+    #[On('todo-deleting')]
+    public function onTodoDeleting(Todo $todo): void
+    {
+        $this->resetMessages();
+
+        $todo->delete();
+
+        $this->infoMessages[] = 'Todoを削除しました';
+        $this->dispatch('todo-deleted');
+    }
+
     private function resetMessages(): void
     {
         $this->reset('infoMessages');
